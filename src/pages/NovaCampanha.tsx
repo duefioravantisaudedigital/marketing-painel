@@ -242,7 +242,8 @@ export default function NovaCampanha() {
               <div className="flex justify-between"><dt className="text-slate-500">Imagem</dt><dd>{template?.exigeImagem ? 'Sim' : 'Não'}</dd></div>
             </dl>
             <p className="mt-4 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800">
-              Serão enviadas <strong>{formatarNumero(pacientes.length)} mensagens</strong> pelo WhatsApp.
+              {pacientes.length === 1 ? 'Será enviada ' : 'Serão enviadas '}
+              <strong>{formatarNumero(pacientes.length)} {pacientes.length === 1 ? 'mensagem' : 'mensagens'}</strong> pelo WhatsApp.
               Depois de confirmar, não dá para desfazer.
             </p>
             <div className="mt-6 flex justify-end gap-2">
