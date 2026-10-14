@@ -1,1 +1,14 @@
 @import "tailwindcss";
+
+/* Cores do ecossistema Due/Atestta (guia de marca) */
+@theme {
+  --color-marca-escuro: #163c70;
+  --color-marca-petroleo: #126580;
+  --color-marca-turquesa: #0a8c8a;
+  --color-marca-claro: #cfe7ea;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  @apply bg-slate-50 text-slate-800 antialiased;
+}
