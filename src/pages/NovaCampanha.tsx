@@ -141,7 +141,7 @@ export default function NovaCampanha() {
           <div className="grid gap-5 sm:grid-cols-3">
             <div className="sm:col-span-2">
               <label className={rotulo} htmlFor="template">Template</label>
-              <input id="template" className={`${campo} font-mono`} value={template} maxLength={512} placeholder="lembrete_36"
+              <input id="template" className={`${campo} font-mono`} value={template} maxLength={512} placeholder="nome_do_template"
                 autoComplete="off" spellCheck={false}
                 onChange={(e) => setTemplate(e.target.value)} />
               <p className={ajuda}>Nome exato do template aprovado no WhatsApp Manager.</p>
