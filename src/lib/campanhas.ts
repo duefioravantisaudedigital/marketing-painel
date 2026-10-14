@@ -1,4 +1,5 @@
 import { api } from './api'
+import type { Pagina } from './pacientes'
 
 export type TipoCampanha = 'MARKETING' | 'UTILITY'
 
@@ -25,6 +26,7 @@ export interface Campanha {
   entregues: number
   lidos: number
   falhas: number
+  cliques: number
 }
 
 export function criarCampanha(dados: NovaCampanha) {
@@ -72,4 +74,33 @@ export const INTERVALO_ATUALIZACAO_MS = 15_000
 
 export function emAndamento(c: Campanha) {
   return c.pendentes > 0
+}
+
+export interface BotaoResumo {
+  botao: string
+  pacientes: number
+}
+
+export type FiltroDestinatario = 'TODOS' | 'LERAM' | 'CLICARAM' | 'NAO_LERAM' | 'FALHARAM'
+
+export interface Destinatario {
+  envioId: number
+  pacienteId: number
+  nome: string | null
+  telefone: string
+  status: 'pendente' | 'enviando' | 'enviado' | 'entregue' | 'lido' | 'falhou'
+  enviadoEm: string | null
+  entregueEm: string | null
+  lidoEm: string | null
+  botao: string | null
+  clicouEm: string | null
+  erro: string | null
+}
+
+export function listarBotoes(id: number) {
+  return api<BotaoResumo[]>(`/campanhas/${id}/botoes`)
+}
+
+export function listarDestinatarios(id: number, filtro: FiltroDestinatario, pagina: number) {
+  return api<Pagina<Destinatario>>(`/campanhas/${id}/destinatarios?filtro=${filtro}&pagina=${pagina}`)
 }

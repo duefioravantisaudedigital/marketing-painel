@@ -1,7 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router'
 import { ProgressoCampanha, StatusCampanha } from '../components/ProgressoCampanha'
-import { INTERVALO_ATUALIZACAO_MS, buscarCampanha, emAndamento, listarFalhas } from '../lib/campanhas'
+import { BarrasHorizontais } from '../components/BarrasHorizontais'
+import { Destinatarios } from '../components/Destinatarios'
+import { INTERVALO_ATUALIZACAO_MS, buscarCampanha, emAndamento, listarBotoes, listarFalhas } from '../lib/campanhas'
 import { formatarDataHora, formatarNumero, porcentagem } from '../lib/formato'
 
 export default function CampanhaDetalhe() {
@@ -23,6 +25,13 @@ export default function CampanhaDetalhe() {
     enabled: !!c && c.falhas > 0,
   })
 
+  // Cliques por botao: busca de novo quando o total de cliques muda
+  const botoes = useQuery({
+    queryKey: ['campanha', id, 'botoes', c?.cliques],
+    queryFn: () => listarBotoes(id),
+    enabled: !!c && c.cliques > 0,
+  })
+
   if (campanha.isError) {
     return (
       <div className="space-y-3">
@@ -36,12 +45,14 @@ export default function CampanhaDetalhe() {
 
   const numeros = [
     { nome: 'Mensagens', valor: c.total, extra: null },
-    { nome: 'Enviadas', valor: c.enviados, extra: porcentagem(c.enviados, c.total) },
     { nome: 'Entregues', valor: c.entregues, extra: porcentagem(c.entregues, c.total) },
     { nome: 'Lidas', valor: c.lidos, extra: porcentagem(c.lidos, c.total) },
+    { nome: 'Clicaram', valor: c.cliques, extra: porcentagem(c.cliques, c.total) },
     { nome: 'Na fila', valor: c.pendentes, extra: null },
     { nome: 'Falhas', valor: c.falhas, extra: porcentagem(c.falhas, c.total) },
   ]
+  // Muda quando qualquer numero muda: a lista de destinatarios usa para saber quando atualizar
+  const versao = `${c.entregues}-${c.lidos}-${c.cliques}-${c.falhas}-${c.pendentes}`
 
   return (
     <div className="space-y-5">
@@ -52,6 +63,10 @@ export default function CampanhaDetalhe() {
           <StatusCampanha campanha={c} />
         </div>
         <p className="text-sm text-slate-500">
+          <button onClick={() => campanha.refetch()} disabled={campanha.isFetching}
+            className="float-right rounded-md border border-slate-300 bg-white px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50">
+            {campanha.isFetching ? 'Atualizando…' : 'Atualizar'}
+          </button>
           <span className="font-mono">{c.template}</span> · {c.tipo === 'utility' ? 'Utility' : 'Marketing'} · criada em{' '}
           {formatarDataHora(c.criadoEm)} por {c.criadoPor}
         </p>
@@ -78,10 +93,23 @@ export default function CampanhaDetalhe() {
           <Legenda cor="bg-slate-200" nome="Na fila" />
           <Legenda cor="bg-red-400" nome="Falhas" />
         </div>
-        {emAndamento(c) && (
+        {emAndamento(c) ? (
           <p className="mt-3 text-xs text-slate-500">Enviando aos poucos. Esta tela atualiza sozinha a cada 15 segundos.</p>
+        ) : (
+          <p className="mt-3 text-xs text-slate-500">
+            Leituras e cliques continuam chegando depois do envio: use "Atualizar". Quem desligou a confirmação de leitura
+            no WhatsApp só aparece como lida se clicar em um botão.
+          </p>
         )}
       </div>
+
+      {c.cliques > 0 && (
+        <BarrasHorizontais titulo="Botões clicados" total={c.total}
+          itens={(botoes.data ?? []).map((b) => ({ rotulo: b.botao, valor: b.pacientes }))}
+          nota="Pacientes que clicaram em cada botão. Quem clicou também conta como lida." />
+      )}
+
+      <Destinatarios campanhaId={id} versao={versao} />
 
       {c.falhas > 0 && (
         <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
