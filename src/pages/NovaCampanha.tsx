@@ -18,6 +18,13 @@ const NOME_CATEGORIA = { MARKETING: 'Marketing', UTILITY: 'Utility' } as const
 
 const chave = (t: Template) => `${t.nome}|${t.idioma}`
 
+// Mesma regra do envio na API (EnvioWorker.primeiroNome): "TARIK SILVA" vira "Tarik"
+function primeiroNome(nome: string | undefined) {
+  const primeiro = nome?.trim().split(/\s+/)[0]?.toLowerCase()
+  if (!primeiro) return 'Paciente'
+  return primeiro.charAt(0).toUpperCase() + primeiro.slice(1)
+}
+
 export default function NovaCampanha() {
   const { selecionados, remover, limpar } = useSelecao()
   const queryClient = useQueryClient()
@@ -34,7 +41,7 @@ export default function NovaCampanha() {
   const templates = useQuery({ queryKey: ['templates'], queryFn: listarTemplates })
   const template = templates.data?.find((t) => chave(t) === chaveTemplate) ?? null
   // Na previa, {{1}} vira o primeiro nome do primeiro paciente da lista
-  const nomeExemplo = pacientes[0]?.nome.trim().split(/\s+/)[0] ?? 'Maria'
+  const nomeExemplo = primeiroNome(pacientes[0]?.nome)
 
   const criar = useMutation({
     mutationFn: criarCampanha,
