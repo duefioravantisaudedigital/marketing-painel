@@ -4,6 +4,7 @@ import {
   FILTROS_INICIAIS,
   TAMANHO_PAGINA,
   listarOrigens,
+  exportarPacientes,
   listarPacientes,
   type Filtros,
   type Origem,
@@ -43,6 +44,21 @@ export default function Pacientes() {
     queryFn: listarOrigens,
     staleTime: 60 * 60 * 1000, // so muda no sync diario
   })
+
+  const [exportando, setExportando] = useState(false)
+  const [erroExportacao, setErroExportacao] = useState<string | null>(null)
+
+  async function exportar() {
+    setExportando(true)
+    setErroExportacao(null)
+    try {
+      await exportarPacientes(filtros)
+    } catch (e) {
+      setErroExportacao(e instanceof Error ? e.message : 'Não foi possível exportar.')
+    } finally {
+      setExportando(false)
+    }
+  }
 
   const lista = useQuery({
     queryKey: ['pacientes', filtros, pagina],
@@ -85,6 +101,14 @@ export default function Pacientes() {
           <p className="text-sm text-slate-500">
             {lista.data ? `${formatarNumero(total)} pacientes com telefone neste filtro` : 'Carregando…'}
           </p>
+        </div>
+        <div className="text-right">
+          <button onClick={exportar} disabled={exportando || total === 0}
+            title="Baixa todos os pacientes do filtro aplicado, com origem, como conheceu, datas e histórico de envio"
+            className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50">
+            {exportando ? 'Exportando…' : `Exportar CSV (${formatarNumero(total)})`}
+          </button>
+          {erroExportacao && <p className="mt-1 text-xs text-red-700">{erroExportacao}</p>}
         </div>
       </div>
 

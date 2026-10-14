@@ -1,4 +1,4 @@
-import { api } from './api'
+import { api, baixar } from './api'
 
 export type HistoricoEnvio = 'TODOS' | 'NUNCA' | 'MARKETING' | 'UTILITY'
 export type Ordenacao = 'ULTIMA_CONSULTA' | 'NOME' | 'PASSAGENS'
@@ -54,12 +54,17 @@ export interface Origem {
 
 export const TAMANHO_PAGINA = 50
 
-export function listarPacientes(filtros: Filtros, pagina: number) {
+// So manda o que foi preenchido: campo vazio = sem filtro
+function parametros(filtros: Filtros) {
   const params = new URLSearchParams()
-  // So manda o que foi preenchido: campo vazio = sem filtro
   for (const [chave, valor] of Object.entries(filtros)) {
     if (valor !== '' && valor !== null) params.set(chave, String(valor).trim())
   }
+  return params
+}
+
+export function listarPacientes(filtros: Filtros, pagina: number) {
+  const params = parametros(filtros)
   params.set('pagina', String(pagina))
   params.set('tamanho', String(TAMANHO_PAGINA))
   return api<Pagina<Paciente>>(`/pacientes?${params.toString()}`)
@@ -67,4 +72,10 @@ export function listarPacientes(filtros: Filtros, pagina: number) {
 
 export function listarOrigens() {
   return api<Origem[]>('/pacientes/origens')
+}
+
+/** CSV com todos os pacientes do filtro aplicado (sem paginacao). */
+export function exportarPacientes(filtros: Filtros) {
+  const hoje = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date())
+  return baixar(`/pacientes/exportar?${parametros(filtros).toString()}`, `pacientes-${hoje}.csv`)
 }

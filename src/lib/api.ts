@@ -52,3 +52,37 @@ export async function api<T>(caminho: string, opcoes: RequestInit = {}): Promise
   if (resposta.status === 204) return undefined as T
   return (await resposta.json()) as T
 }
+
+/**
+ * Baixa um arquivo da API (com o token) e entrega ao navegador como download.
+ * Nao da para usar um link simples porque o link nao leva o cabecalho Authorization.
+ */
+export async function baixar(caminho: string, nomeArquivo: string): Promise<void> {
+  const token = lerToken()
+  let resposta: Response
+  try {
+    resposta = await fetch(`${BASE}${caminho}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} })
+  } catch {
+    throw new ErroApi(0, 'Não foi possível falar com o servidor. Verifique sua conexão.')
+  }
+  if (resposta.status === 401) {
+    limparSessao()
+    window.location.assign('/login')
+    throw new ErroApi(401, 'Sessão expirada. Entre novamente.')
+  }
+  if (!resposta.ok) {
+    let corpo: { title?: string; detail?: string } = {}
+    try {
+      corpo = await resposta.json()
+    } catch {
+      // resposta sem corpo
+    }
+    throw new ErroApi(resposta.status, corpo.detail ?? corpo.title ?? `Erro ${resposta.status}`)
+  }
+  const url = URL.createObjectURL(await resposta.blob())
+  const link = document.createElement('a')
+  link.href = url
+  link.download = nomeArquivo
+  link.click()
+  URL.revokeObjectURL(url)
+}
