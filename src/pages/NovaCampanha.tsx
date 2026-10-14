@@ -51,6 +51,7 @@ export default function NovaCampanha() {
       // A coluna "ultimo marketing/utility" da listagem muda: busca de novo na proxima vez
       queryClient.invalidateQueries({ queryKey: ['pacientes'] })
       queryClient.invalidateQueries({ queryKey: ['campanhas'] })
+      queryClient.invalidateQueries({ queryKey: ['resumo-envios'] })
     },
     onSettled: () => setConfirmando(false),
   })

@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from 'react-router'
 import { ProgressoCampanha, StatusCampanha } from '../components/ProgressoCampanha'
+import { ResumoEnvios } from '../components/ResumoEnvios'
 import { INTERVALO_ATUALIZACAO_MS, emAndamento, listarCampanhas } from '../lib/campanhas'
 import { formatarDataHora, formatarNumero, porcentagem } from '../lib/formato'
 
@@ -18,10 +19,11 @@ export default function Campanhas() {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="text-xl font-semibold text-marca-escuro">Campanhas</h1>
-        <p className="text-sm text-slate-500">As 100 mais recentes</p>
-      </div>
+      <h1 className="text-xl font-semibold text-marca-escuro">Campanhas</h1>
+
+      <ResumoEnvios />
+
+      <h2 className="pt-2 text-sm font-medium text-slate-700">As 100 campanhas mais recentes</h2>
 
       {campanhas.isError && (
         <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{campanhas.error.message}</div>
