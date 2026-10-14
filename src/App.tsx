@@ -3,6 +3,7 @@ import { Layout } from './components/Layout'
 import { RotaProtegida } from './components/RotaProtegida'
 import CampanhaDetalhe from './pages/CampanhaDetalhe'
 import Campanhas from './pages/Campanhas'
+import Dashboard from './pages/Dashboard'
 import Login from './pages/Login'
 import NovaCampanha from './pages/NovaCampanha'
 import Pacientes from './pages/Pacientes'
@@ -27,6 +28,7 @@ export default function App() {
         <Route path="/campanhas" element={<Campanhas />} />
         <Route path="/campanhas/nova" element={<NovaCampanha />} />
         <Route path="/campanhas/:id" element={<CampanhaDetalhe />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

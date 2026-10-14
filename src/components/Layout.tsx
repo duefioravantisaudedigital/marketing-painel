@@ -19,6 +19,7 @@ export function Layout({ children }: { children: ReactNode }) {
             <nav className="flex gap-1 text-sm">
               <NavLink to="/" end className={classeLink}>Pacientes</NavLink>
               <NavLink to="/campanhas" className={classeLink}>Campanhas</NavLink>
+              <NavLink to="/dashboard" className={classeLink}>Dashboard</NavLink>
             </nav>
           </div>
           <button
