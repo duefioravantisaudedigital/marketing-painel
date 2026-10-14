@@ -1,0 +1,17 @@
+# Servidor interno do painel (so na rede "web"; o HTTPS e o Caddy principal da VPS)
+:80 {
+	root * /srv
+	encode gzip
+
+	# Arquivos de /assets tem o hash no nome: podem ficar em cache para sempre
+	@assets path /assets/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+
+	# O resto (index.html) sempre confere se ha versao nova depois de um deploy
+	@paginas not path /assets/*
+	header @paginas Cache-Control "no-cache"
+
+	# Rotas do React (/campanhas, /dashboard...) caem no index.html
+	try_files {path} /index.html
+	file_server
+}
