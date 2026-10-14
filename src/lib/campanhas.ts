@@ -30,3 +30,22 @@ export interface Campanha {
 export function criarCampanha(dados: NovaCampanha) {
   return api<Campanha>('/campanhas', { method: 'POST', body: JSON.stringify(dados) })
 }
+
+export interface Template {
+  nome: string
+  idioma: string
+  categoria: 'MARKETING' | 'UTILITY'
+  cabecalho: 'NENHUM' | 'TEXTO' | 'IMAGEM' | 'VIDEO' | 'DOCUMENTO' | 'OUTRO'
+  cabecalhoTexto: string | null
+  corpo: string | null
+  rodape: string | null
+  botoes: string[]
+  variaveis: number
+  exigeImagem: boolean
+  suportado: boolean
+  motivo: string | null
+}
+
+export function listarTemplates() {
+  return api<Template[]>('/templates')
+}
