@@ -1,3 +1,6 @@
+// No mailing_master a fonte do medsync ficou gravada como "carol"
+export const NOME_FONTE: Record<string, string> = { carol: 'medsync', atestta: 'Atestta' }
+
 // "11999998888" -> "(11) 99999-8888"
 export function formatarTelefone(telefone: string | null): string {
   if (!telefone) return '—'

@@ -6,19 +6,15 @@ import {
   listarOrigens,
   listarPacientes,
   type Filtros,
-  type Paciente,
 } from '../lib/pacientes'
-import { formatarData, formatarNumero, formatarTelefone } from '../lib/formato'
-
-// Limite de pacientes por campanha (o mesmo da API)
-const MAX_SELECAO = 1000
+import { Link } from 'react-router'
+import { NOME_FONTE, formatarData, formatarNumero, formatarTelefone } from '../lib/formato'
+import { MAX_SELECAO, useSelecao } from '../lib/selecao'
 
 const campo =
   'w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-marca-turquesa focus:outline-none focus:ring-2 focus:ring-marca-turquesa/30'
 const rotulo = 'mb-1 block text-xs font-medium text-slate-600'
 
-// No mailing_master a fonte do medsync ficou gravada como "carol"
-const NOME_FONTE: Record<string, string> = { carol: 'medsync', atestta: 'Atestta' }
 
 export default function Pacientes() {
   // "rascunho" e o que esta no formulario; "filtros" e o que foi aplicado.
@@ -26,7 +22,7 @@ export default function Pacientes() {
   const [rascunho, setRascunho] = useState<Filtros>(FILTROS_INICIAIS)
   const [filtros, setFiltros] = useState<Filtros>(FILTROS_INICIAIS)
   const [pagina, setPagina] = useState(0)
-  const [selecionados, setSelecionados] = useState<Map<number, Paciente>>(new Map())
+  const { selecionados, alternar, adicionar, remover, limpar } = useSelecao()
 
   const origens = useQuery({
     queryKey: ['origens'],
@@ -60,28 +56,11 @@ export default function Pacientes() {
     setPagina(0)
   }
 
-  function alternar(p: Paciente) {
-    setSelecionados((atual) => {
-      const novo = new Map(atual)
-      if (novo.has(p.id)) novo.delete(p.id)
-      else if (novo.size < MAX_SELECAO) novo.set(p.id, p)
-      return novo
-    })
-  }
-
   const todosDaPagina = itens.length > 0 && itens.every((p) => selecionados.has(p.id))
 
   function alternarPagina() {
-    setSelecionados((atual) => {
-      const novo = new Map(atual)
-      if (todosDaPagina) itens.forEach((p) => novo.delete(p.id))
-      else
-        for (const p of itens) {
-          if (novo.size >= MAX_SELECAO) break
-          novo.set(p.id, p)
-        }
-      return novo
-    })
+    if (todosDaPagina) remover(itens.map((p) => p.id))
+    else adicionar(itens)
   }
 
   return (
@@ -178,9 +157,15 @@ export default function Pacientes() {
             <strong>{formatarNumero(selecionados.size)}</strong> selecionado(s)
             {selecionados.size >= MAX_SELECAO && ' — limite de 1.000 por campanha'}
           </span>
-          <button onClick={() => setSelecionados(new Map())} className="font-medium text-marca-petroleo hover:underline">
-            Limpar seleção
-          </button>
+          <div className="flex items-center gap-4">
+            <button onClick={limpar} className="font-medium text-marca-petroleo hover:underline">
+              Limpar seleção
+            </button>
+            <Link to="/campanhas/nova"
+              className="rounded-md bg-marca-turquesa px-4 py-2 font-semibold text-white hover:bg-marca-petroleo">
+              Criar campanha
+            </Link>
+          </div>
         </div>
       )}
 

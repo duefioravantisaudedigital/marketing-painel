@@ -3,6 +3,7 @@ import { Layout } from './components/Layout'
 import { RotaProtegida } from './components/RotaProtegida'
 import Login from './pages/Login'
 import Pacientes from './pages/Pacientes'
+import NovaCampanha from './pages/NovaCampanha'
 
 export default function App() {
   return (
@@ -14,6 +15,16 @@ export default function App() {
           <RotaProtegida>
             <Layout>
               <Pacientes />
+            </Layout>
+          </RotaProtegida>
+        }
+      />
+      <Route
+        path="/campanhas/nova"
+        element={
+          <RotaProtegida>
+            <Layout>
+              <NovaCampanha />
             </Layout>
           </RotaProtegida>
         }

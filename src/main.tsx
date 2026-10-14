@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router'
 import App from './App.tsx'
 import { AuthProvider } from './lib/auth'
+import { SelecaoProvider } from './lib/selecao'
 import './index.css'
 
 // Cache das consultas: os dados de pacientes so mudam uma vez por dia (sync das 20h),
@@ -22,9 +23,11 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
+        <SelecaoProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </SelecaoProvider>
       </AuthProvider>
     </QueryClientProvider>
   </StrictMode>,
