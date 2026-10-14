@@ -49,7 +49,8 @@ export default function Dashboard() {
   const listaOrigens = origens.data ?? []
   const temCanal = listaOrigens.some((o) => o.origem.startsWith('Atestta ·'))
   const itensOrigem = listaOrigens
-    .filter((o) => !(temCanal && o.origem === 'Atestta'))
+    // "medsync (todos)" e soma dos outros do medsync: nao entra no ranking
+    .filter((o) => !(temCanal && o.origem === 'Atestta') && o.origem !== 'medsync (todos)')
     .sort((a, b) => b.pacientes - a.pacientes)
     .slice(0, 10)
     .map((o) => ({ rotulo: o.origem, valor: o.pacientes }))

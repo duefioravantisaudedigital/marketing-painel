@@ -6,10 +6,24 @@ import {
   listarOrigens,
   listarPacientes,
   type Filtros,
+  type Origem,
 } from '../lib/pacientes'
 import { Link } from 'react-router'
 import { NOME_FONTE, formatarData, formatarNumero, formatarTelefone } from '../lib/formato'
 import { MAX_SELECAO, useSelecao } from '../lib/selecao'
+
+// Atestta e medsync separados; em cada grupo, o total ("todos") vem primeiro e os medicos depois
+function agruparOrigens(origens: Origem[]) {
+  const peso = (o: string) => (o === 'Atestta' || o === 'medsync (todos)' ? 0 : o === 'medsync (base antiga)' ? 1 : 2)
+  const ordenar = (lista: Origem[]) =>
+    [...lista].sort((a, b) => peso(a.origem) - peso(b.origem) || a.origem.localeCompare(b.origem, 'pt-BR'))
+  const atestta = origens.filter((o) => o.origem.startsWith('Atestta'))
+  const medsync = origens.filter((o) => !o.origem.startsWith('Atestta'))
+  return [
+    { grupo: 'Atestta', itens: ordenar(atestta) },
+    { grupo: 'medsync', itens: ordenar(medsync) },
+  ].filter((g) => g.itens.length > 0)
+}
 
 const campo =
   'w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-marca-turquesa focus:outline-none focus:ring-2 focus:ring-marca-turquesa/30'
@@ -92,10 +106,14 @@ export default function Pacientes() {
             <label className={rotulo} htmlFor="origem">Origem</label>
             <select id="origem" className={campo} value={rascunho.origem} onChange={(e) => alterar('origem', e.target.value)}>
               <option value="">Todas</option>
-              {origens.data?.map((o) => (
-                <option key={o.origem} value={o.origem}>
-                  {o.origem} ({formatarNumero(o.pacientes)})
-                </option>
+              {agruparOrigens(origens.data ?? []).map((g) => (
+                <optgroup key={g.grupo} label={g.grupo}>
+                  {g.itens.map((o) => (
+                    <option key={o.origem} value={o.origem}>
+                      {o.origem} ({formatarNumero(o.pacientes)})
+                    </option>
+                  ))}
+                </optgroup>
               ))}
             </select>
           </div>
