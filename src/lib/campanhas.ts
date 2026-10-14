@@ -49,3 +49,27 @@ export interface Template {
 export function listarTemplates() {
   return api<Template[]>('/templates')
 }
+
+export interface FalhaResumo {
+  motivo: string
+  quantidade: number
+}
+
+export function listarCampanhas() {
+  return api<Campanha[]>('/campanhas')
+}
+
+export function buscarCampanha(id: number) {
+  return api<Campanha>(`/campanhas/${id}`)
+}
+
+export function listarFalhas(id: number) {
+  return api<FalhaResumo[]>(`/campanhas/${id}/falhas`)
+}
+
+// Enquanto ha mensagens na fila, a tela atualiza sozinha. Depois para, para o Neon poder dormir.
+export const INTERVALO_ATUALIZACAO_MS = 15_000
+
+export function emAndamento(c: Campanha) {
+  return c.pendentes > 0
+}

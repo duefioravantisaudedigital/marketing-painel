@@ -50,6 +50,7 @@ export default function NovaCampanha() {
       limpar()
       // A coluna "ultimo marketing/utility" da listagem muda: busca de novo na proxima vez
       queryClient.invalidateQueries({ queryKey: ['pacientes'] })
+      queryClient.invalidateQueries({ queryKey: ['campanhas'] })
     },
     onSettled: () => setConfirmando(false),
   })
@@ -95,9 +96,14 @@ export default function NovaCampanha() {
           {criada.falhas > 0 && ` ${formatarNumero(criada.falhas)} ficaram de fora por telefone inválido.`}
         </p>
         <p className="mt-1 text-sm text-slate-500">O envio acontece aos poucos, em segundo plano.</p>
-        <Link to="/" className="mt-6 inline-block rounded-md bg-marca-petroleo px-4 py-2 text-sm font-semibold text-white hover:bg-marca-escuro">
-          Voltar para pacientes
-        </Link>
+        <div className="mt-6 flex justify-center gap-2">
+          <Link to="/" className="rounded-md px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100">
+            Voltar para pacientes
+          </Link>
+          <Link to={`/campanhas/${criada.id}`} className="rounded-md bg-marca-petroleo px-4 py-2 text-sm font-semibold text-white hover:bg-marca-escuro">
+            Acompanhar envio
+          </Link>
+        </div>
       </div>
     )
   }
