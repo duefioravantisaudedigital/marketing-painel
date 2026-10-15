@@ -171,6 +171,15 @@ export default function Pacientes() {
             </select>
           </div>
           <div>
+            <label className={rotulo} htmlFor="jornada">Jornada no Atestta</label>
+            <select id="jornada" className={campo} value={rascunho.jornada}
+              onChange={(e) => alterar('jornada', e.target.value as Filtros['jornada'])}>
+              <option value="TODAS">Tanto faz</option>
+              <option value="MEDPREV_VOLTOU">Veio pela Medprev e voltou direto</option>
+              <option value="SO_MEDPREV">Só Medprev (nunca veio direto)</option>
+            </select>
+          </div>
+          <div>
             <label className={rotulo} htmlFor="ordenacao">Ordenar por</label>
             <select id="ordenacao" className={campo} value={rascunho.ordenacao}
               onChange={(e) => alterar('ordenacao', e.target.value as Filtros['ordenacao'])}>

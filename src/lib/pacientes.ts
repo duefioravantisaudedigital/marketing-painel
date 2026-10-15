@@ -2,6 +2,7 @@ import { api, baixar } from './api'
 
 export type HistoricoEnvio = 'TODOS' | 'NUNCA' | 'MARKETING' | 'UTILITY'
 export type Ordenacao = 'ULTIMA_CONSULTA' | 'NOME' | 'PASSAGENS'
+export type Jornada = 'TODAS' | 'MEDPREV_VOLTOU' | 'SO_MEDPREV'
 
 export interface Filtros {
   origem: string
@@ -9,6 +10,7 @@ export interface Filtros {
   semConsultaUltimosDias: string
   minPassagens: string
   historicoEnvio: HistoricoEnvio
+  jornada: Jornada
   cidade: string
   busca: string
   ordenacao: Ordenacao
@@ -20,6 +22,7 @@ export const FILTROS_INICIAIS: Filtros = {
   semConsultaUltimosDias: '',
   minPassagens: '',
   historicoEnvio: 'TODOS',
+  jornada: 'TODAS',
   cidade: '',
   busca: '',
   ordenacao: 'ULTIMA_CONSULTA',
