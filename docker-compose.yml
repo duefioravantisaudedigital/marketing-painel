@@ -8,9 +8,11 @@ services:
     restart: unless-stopped
     networks: [web]
     mem_limit: 64m
+    # Log no journald do sistema: sobrevive a cada deploy (o json-file some quando o container e recriado)
     logging:
-      driver: json-file
-      options: {max-size: "10m", max-file: "3"}
+      driver: journald
+      options:
+        tag: marketing-painel
 
 networks:
   web:
