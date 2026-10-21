@@ -77,6 +77,9 @@ export default function Campanhas() {
                 <td className="px-4 py-3 text-right tabular-nums text-slate-700">
                   {formatarNumero(c.conversoes)}
                   <span className="ml-1 text-xs text-slate-500">{porcentagem(c.conversoes, c.enviados)}</span>
+                  {c.conversoesMedprev > 0 && (
+                    <div className="text-xs text-amber-700">+{formatarNumero(c.conversoesMedprev)} Medprev</div>
+                  )}
                 </td>
                 <td className={`px-4 py-3 text-right tabular-nums ${c.falhas > 0 ? 'text-red-700' : 'text-slate-700'}`}>
                   {formatarNumero(c.falhas)}

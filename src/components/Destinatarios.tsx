@@ -8,6 +8,7 @@ const FILTROS: { valor: FiltroDestinatario; nome: string }[] = [
   { valor: 'LERAM', nome: 'Leram' },
   { valor: 'CLICARAM', nome: 'Clicaram' },
   { valor: 'CONVERTERAM', nome: 'Converteram' },
+  { valor: 'CONVERTERAM_MEDPREV', nome: 'Pela Medprev' },
   { valor: 'NAO_LERAM', nome: 'Não leram' },
   { valor: 'FALHARAM', nome: 'Falharam' },
 ]
@@ -87,7 +88,7 @@ export function Destinatarios({ campanhaId, versao }: { campanhaId: number; vers
                 <td className="px-5 py-2.5">
                   {d.consultouEm ? (
                     <div>
-                      <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-xs font-medium text-emerald-800">
+                      <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${d.viaMedprev ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}`}>
                         {formatarData(d.consultouEm)}
                       </span>
                       <div className="mt-0.5 text-xs text-slate-500">{d.consultouOrigem}</div>

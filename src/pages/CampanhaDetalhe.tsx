@@ -33,9 +33,9 @@ export default function CampanhaDetalhe() {
   })
 
   const conversoes = useQuery({
-    queryKey: ['campanha', id, 'conversoes', c?.conversoes],
+    queryKey: ['campanha', id, 'conversoes', c?.conversoes, c?.conversoesMedprev],
     queryFn: () => listarConversoes(id),
-    enabled: !!c && c.conversoes > 0,
+    enabled: !!c && c.conversoes + c.conversoesMedprev > 0,
   })
 
   if (campanha.isError) {
@@ -58,13 +58,13 @@ export default function CampanhaDetalhe() {
     {
       nome: 'Converteram',
       valor: c.conversoes,
-      extra: `${porcentagem(c.conversoes, c.enviados)}${aberta && c.janelaAte ? ` · até ${formatarData(c.janelaAte)}` : ''}`,
+      extra: `${porcentagem(c.conversoes, c.enviados)}${c.conversoesMedprev > 0 ? ` · +${c.conversoesMedprev} Medprev` : ''}`,
     },
     { nome: c.pendentes > 0 ? 'Na fila' : 'Falhas', valor: c.pendentes > 0 ? c.pendentes : c.falhas,
       extra: c.pendentes > 0 ? null : porcentagem(c.falhas, c.total) },
   ]
   // Muda quando qualquer numero muda: a lista de destinatarios usa para saber quando atualizar
-  const versao = `${c.entregues}-${c.lidos}-${c.cliques}-${c.conversoes}-${c.falhas}-${c.pendentes}`
+  const versao = `${c.entregues}-${c.lidos}-${c.cliques}-${c.conversoes}-${c.conversoesMedprev}-${c.falhas}-${c.pendentes}`
 
   return (
     <div className="space-y-5">
@@ -119,14 +119,32 @@ export default function CampanhaDetalhe() {
         <h2 className="text-sm font-medium text-slate-700">Conversão em consulta</h2>
         <p className="mt-1 text-sm text-slate-600">
           Conta quem passou em consulta na plataforma em <strong>até 30 dias</strong> depois de receber a mensagem.
-          O mesmo paciente pode contar em mais de uma campanha. O canal mostra por onde o agendamento chegou:
-          base própria ou Medprev, no Atestta, ou a médica, no medsync. As consultas chegam pelo sync das 20h, então
-          uma consulta de hoje aparece amanhã.
+          O mesmo paciente pode contar em mais de uma campanha. As consultas chegam pelo sync das 20h, então uma
+          consulta de hoje aparece amanhã.
           {aberta && c.janelaAte && <> A janela desta campanha fica aberta até <strong>{formatarData(c.janelaAte)}</strong>.</>}
         </p>
-        {c.conversoes > 0 && (
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <div className="rounded-md border border-emerald-200 bg-emerald-50 p-4">
+            <div className="text-xs font-medium text-emerald-800">Voltaram direto</div>
+            <div className="mt-1 text-2xl font-semibold tabular-nums text-emerald-800">{formatarNumero(c.conversoes)}</div>
+            <div className="text-xs text-emerald-700">
+              {porcentagem(c.conversoes, c.enviados)} das mensagens enviadas · base própria do Atestta ou medsync
+            </div>
+          </div>
+          <div className="rounded-md border border-amber-200 bg-amber-50 p-4">
+            <div className="text-xs font-medium text-amber-800">Voltaram pela Medprev</div>
+            <div className="mt-1 text-2xl font-semibold tabular-nums text-amber-800">{formatarNumero(c.conversoesMedprev)}</div>
+            <div className="text-xs text-amber-700">
+              {porcentagem(c.conversoesMedprev, c.enviados)} · consultaram no prazo, mas agendaram pela Medprev
+            </div>
+          </div>
+        </div>
+        <p className="mt-3 text-xs text-slate-500">
+          Se o paciente agendou direto e também pela Medprev dentro do prazo, ele conta como "direto".
+        </p>
+        {c.conversoes + c.conversoesMedprev > 0 && (
           <div className="mt-4">
-            <BarrasHorizontais titulo="Canal do agendamento" total={c.conversoes}
+            <BarrasHorizontais titulo="Canal do agendamento" total={c.conversoes + c.conversoesMedprev}
               itens={(conversoes.data ?? []).map((o) => ({ rotulo: o.botao, valor: o.pacientes }))} />
           </div>
         )}

@@ -28,6 +28,7 @@ export interface Campanha {
   falhas: number
   cliques: number
   conversoes: number
+  conversoesMedprev: number
   janelaAte: string | null
 }
 
@@ -83,7 +84,7 @@ export interface BotaoResumo {
   pacientes: number
 }
 
-export type FiltroDestinatario = 'TODOS' | 'LERAM' | 'CLICARAM' | 'CONVERTERAM' | 'NAO_LERAM' | 'FALHARAM'
+export type FiltroDestinatario = 'TODOS' | 'LERAM' | 'CLICARAM' | 'CONVERTERAM' | 'CONVERTERAM_MEDPREV' | 'NAO_LERAM' | 'FALHARAM'
 
 export interface Destinatario {
   envioId: number
@@ -98,6 +99,7 @@ export interface Destinatario {
   clicouEm: string | null
   consultouEm: string | null
   consultouOrigem: string | null
+  viaMedprev: boolean
   erro: string | null
 }
 
