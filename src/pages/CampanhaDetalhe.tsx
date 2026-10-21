@@ -118,14 +118,15 @@ export default function CampanhaDetalhe() {
       <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
         <h2 className="text-sm font-medium text-slate-700">Conversão em consulta</h2>
         <p className="mt-1 text-sm text-slate-600">
-          Conta quem passou em consulta em <strong>até 30 dias</strong> depois de receber a mensagem, em qualquer origem.
-          O mesmo paciente pode contar em mais de uma campanha. As consultas chegam pelo sync das 20h, então uma consulta
-          de hoje aparece amanhã.
+          Conta quem passou em consulta na plataforma em <strong>até 30 dias</strong> depois de receber a mensagem.
+          O mesmo paciente pode contar em mais de uma campanha. O canal mostra por onde o agendamento chegou:
+          base própria ou Medprev, no Atestta, ou a médica, no medsync. As consultas chegam pelo sync das 20h, então
+          uma consulta de hoje aparece amanhã.
           {aberta && c.janelaAte && <> A janela desta campanha fica aberta até <strong>{formatarData(c.janelaAte)}</strong>.</>}
         </p>
         {c.conversoes > 0 && (
           <div className="mt-4">
-            <BarrasHorizontais titulo="Onde consultaram" total={c.conversoes}
+            <BarrasHorizontais titulo="Canal do agendamento" total={c.conversoes}
               itens={(conversoes.data ?? []).map((o) => ({ rotulo: o.botao, valor: o.pacientes }))} />
           </div>
         )}
