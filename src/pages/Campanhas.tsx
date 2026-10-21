@@ -40,6 +40,7 @@ export default function Campanhas() {
               <th className="px-4 py-3 text-right">Entregues</th>
               <th className="px-4 py-3 text-right">Lidas</th>
               <th className="px-4 py-3 text-right">Cliques</th>
+              <th className="px-4 py-3 text-right">Conversões</th>
               <th className="px-4 py-3 text-right">Falhas</th>
               <th className="px-4 py-3">Status</th>
             </tr>
@@ -47,11 +48,11 @@ export default function Campanhas() {
           <tbody className="divide-y divide-slate-100">
             {campanhas.isPending &&
               Array.from({ length: 4 }).map((_, i) => (
-                <tr key={i}><td colSpan={9} className="px-4 py-3"><div className="h-4 animate-pulse rounded bg-slate-100" /></td></tr>
+                <tr key={i}><td colSpan={10} className="px-4 py-3"><div className="h-4 animate-pulse rounded bg-slate-100" /></td></tr>
               ))}
             {!campanhas.isPending && lista.length === 0 && (
               <tr>
-                <td colSpan={9} className="px-4 py-10 text-center text-slate-500">
+                <td colSpan={10} className="px-4 py-10 text-center text-slate-500">
                   Nenhuma campanha ainda. Selecione pacientes na <Link to="/" className="text-marca-petroleo hover:underline">lista</Link> para criar a primeira.
                 </td>
               </tr>
@@ -73,6 +74,10 @@ export default function Campanhas() {
                 <td className="px-4 py-3 text-right tabular-nums text-slate-700">{porcentagem(c.entregues, c.total)}</td>
                 <td className="px-4 py-3 text-right tabular-nums text-slate-700">{porcentagem(c.lidos, c.total)}</td>
                 <td className="px-4 py-3 text-right tabular-nums text-slate-700">{porcentagem(c.cliques, c.total)}</td>
+                <td className="px-4 py-3 text-right tabular-nums text-slate-700">
+                  {formatarNumero(c.conversoes)}
+                  <span className="ml-1 text-xs text-slate-500">{porcentagem(c.conversoes, c.enviados)}</span>
+                </td>
                 <td className={`px-4 py-3 text-right tabular-nums ${c.falhas > 0 ? 'text-red-700' : 'text-slate-700'}`}>
                   {formatarNumero(c.falhas)}
                 </td>

@@ -27,6 +27,8 @@ export interface Campanha {
   lidos: number
   falhas: number
   cliques: number
+  conversoes: number
+  janelaAte: string | null
 }
 
 export function criarCampanha(dados: NovaCampanha) {
@@ -81,7 +83,7 @@ export interface BotaoResumo {
   pacientes: number
 }
 
-export type FiltroDestinatario = 'TODOS' | 'LERAM' | 'CLICARAM' | 'NAO_LERAM' | 'FALHARAM'
+export type FiltroDestinatario = 'TODOS' | 'LERAM' | 'CLICARAM' | 'CONVERTERAM' | 'NAO_LERAM' | 'FALHARAM'
 
 export interface Destinatario {
   envioId: number
@@ -94,6 +96,8 @@ export interface Destinatario {
   lidoEm: string | null
   botao: string | null
   clicouEm: string | null
+  consultouEm: string | null
+  consultouOrigem: string | null
   erro: string | null
 }
 
@@ -103,4 +107,13 @@ export function listarBotoes(id: number) {
 
 export function listarDestinatarios(id: number, filtro: FiltroDestinatario, pagina: number) {
   return api<Pagina<Destinatario>>(`/campanhas/${id}/destinatarios?filtro=${filtro}&pagina=${pagina}`)
+}
+
+export function listarConversoes(id: number) {
+  return api<BotaoResumo[]>(`/campanhas/${id}/conversoes`)
+}
+
+/** A janela de 30 dias ainda esta aberta: o numero de conversoes pode subir. */
+export function janelaAberta(c: Campanha) {
+  return !!c.janelaAte && new Date(c.janelaAte).getTime() > Date.now()
 }

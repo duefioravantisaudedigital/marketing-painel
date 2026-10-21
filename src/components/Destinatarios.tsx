@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { listarDestinatarios, type Destinatario, type FiltroDestinatario } from '../lib/campanhas'
-import { formatarDataHora, formatarNumero, formatarTelefone } from '../lib/formato'
+import { formatarData, formatarDataHora, formatarNumero, formatarTelefone } from '../lib/formato'
 
 const FILTROS: { valor: FiltroDestinatario; nome: string }[] = [
   { valor: 'TODOS', nome: 'Todos' },
   { valor: 'LERAM', nome: 'Leram' },
   { valor: 'CLICARAM', nome: 'Clicaram' },
+  { valor: 'CONVERTERAM', nome: 'Converteram' },
   { valor: 'NAO_LERAM', nome: 'Não leram' },
   { valor: 'FALHARAM', nome: 'Falharam' },
 ]
@@ -58,6 +59,7 @@ export function Destinatarios({ campanhaId, versao }: { campanhaId: number; vers
               <th className="px-5 py-2.5">Entregue</th>
               <th className="px-5 py-2.5">Lida</th>
               <th className="px-5 py-2.5">Clicou</th>
+              <th className="px-5 py-2.5">Consultou</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -82,13 +84,25 @@ export function Destinatarios({ campanhaId, versao }: { campanhaId: number; vers
                     <span className="text-slate-400">—</span>
                   )}
                 </td>
+                <td className="px-5 py-2.5">
+                  {d.consultouEm ? (
+                    <div>
+                      <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-xs font-medium text-emerald-800">
+                        {formatarData(d.consultouEm)}
+                      </span>
+                      <div className="mt-0.5 text-xs text-slate-500">{d.consultouOrigem}</div>
+                    </div>
+                  ) : (
+                    <span className="text-slate-400">—</span>
+                  )}
+                </td>
               </tr>
             ))}
             {lista.data && lista.data.itens.length === 0 && (
-              <tr><td colSpan={6} className="px-5 py-8 text-center text-slate-500">Ninguém neste recorte.</td></tr>
+              <tr><td colSpan={7} className="px-5 py-8 text-center text-slate-500">Ninguém neste recorte.</td></tr>
             )}
             {lista.isPending && (
-              <tr><td colSpan={6} className="px-5 py-3"><div className="h-4 animate-pulse rounded bg-slate-100" /></td></tr>
+              <tr><td colSpan={7} className="px-5 py-3"><div className="h-4 animate-pulse rounded bg-slate-100" /></td></tr>
             )}
           </tbody>
         </table>
