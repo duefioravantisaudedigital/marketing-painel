@@ -16,6 +16,12 @@ const PADRAO_IMAGEM = /^https:\/\/\S+$/
 
 const NOME_CATEGORIA = { MARKETING: 'Marketing', UTILITY: 'Utility' } as const
 
+// Imagem de cabeçalho padrão por template (preenche sozinha; dá para trocar antes de enviar)
+const IMAGENS_PADRAO: Record<string, string> = {
+  lembrete_36: 'https://www.duefioravanti-saudedigital.com.br/whatsapp/cupom-souatestta.jpeg',
+  call_out_1_1: 'https://www.duefioravanti-saudedigital.com.br/whatsapp/cabecalho-due-fioravanti.png',
+}
+
 const chave = (t: Template) => `${t.nome}|${t.idioma}`
 
 // Mesma regra do envio na API (EnvioWorker.primeiroNome): "TARIK SILVA" vira "Tarik"
@@ -40,6 +46,13 @@ export default function NovaCampanha() {
 
   const templates = useQuery({ queryKey: ['templates'], queryFn: listarTemplates })
   const template = templates.data?.find((t) => chave(t) === chaveTemplate) ?? null
+
+  // Troca o template: já preenche a imagem padrão daquele template (se tiver)
+  function escolherTemplate(novaChave: string) {
+    setChaveTemplate(novaChave)
+    const novo = templates.data?.find((t) => chave(t) === novaChave) ?? null
+    setImagemUrl(novo?.exigeImagem ? (IMAGENS_PADRAO[novo.nome] ?? '') : '')
+  }
   // Na previa, {{1}} vira o primeiro nome do primeiro paciente da lista
   const nomeExemplo = primeiroNome(pacientes[0]?.nome)
 
@@ -141,7 +154,7 @@ export default function NovaCampanha() {
           <div>
             <label className={rotulo} htmlFor="template">Template</label>
             <select id="template" className={campo} value={chaveTemplate} disabled={!templates.data}
-              onChange={(e) => setChaveTemplate(e.target.value)}>
+              onChange={(e) => escolherTemplate(e.target.value)}>
               <option value="">
                 {templates.isPending ? 'Carregando templates da Meta…' : 'Escolha um template aprovado'}
               </option>
