@@ -10,7 +10,7 @@ import {
   type Origem,
 } from '../lib/pacientes'
 import { Link } from 'react-router'
-import { NOME_FONTE, formatarData, formatarNumero, formatarTelefone } from '../lib/formato'
+import { formatarData, formatarNumero, formatarTelefone } from '../lib/formato'
 import { MAX_SELECAO, useSelecao } from '../lib/selecao'
 
 // Atestta e medsync separados; em cada grupo, o total ("todos") vem primeiro e os medicos depois
@@ -238,7 +238,6 @@ export default function Pacientes() {
               <th className="px-3 py-3">Paciente</th>
               <th className="px-3 py-3">Telefone</th>
               <th className="px-3 py-3">Cidade</th>
-              <th className="px-3 py-3">Origem</th>
               <th className="px-3 py-3 text-right">Passagens</th>
               <th className="px-3 py-3">Última consulta</th>
               <th className="px-3 py-3">Último marketing</th>
@@ -249,14 +248,14 @@ export default function Pacientes() {
             {lista.isPending &&
               Array.from({ length: 8 }).map((_, i) => (
                 <tr key={i}>
-                  <td colSpan={9} className="px-3 py-3">
+                  <td colSpan={8} className="px-3 py-3">
                     <div className="h-4 animate-pulse rounded bg-slate-100" />
                   </td>
                 </tr>
               ))}
             {!lista.isPending && itens.length === 0 && (
               <tr>
-                <td colSpan={9} className="px-3 py-10 text-center text-slate-500">
+                <td colSpan={8} className="px-3 py-10 text-center text-slate-500">
                   Nenhum paciente encontrado com esses filtros.
                 </td>
               </tr>
@@ -277,9 +276,6 @@ export default function Pacientes() {
                   <td className="whitespace-nowrap px-3 py-2.5 text-slate-700">{formatarTelefone(p.telefone)}</td>
                   <td className="px-3 py-2.5 text-slate-700">
                     {p.cidade ? `${p.cidade}${p.estado ? `/${p.estado}` : ''}` : '—'}
-                  </td>
-                  <td className="px-3 py-2.5">
-                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">{NOME_FONTE[p.fonte] ?? p.fonte}</span>
                   </td>
                   <td className="px-3 py-2.5 text-right tabular-nums text-slate-700">{p.passagens}</td>
                   <td className="whitespace-nowrap px-3 py-2.5 text-slate-700">
