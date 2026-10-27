@@ -8,6 +8,8 @@ export interface Filtros {
   origem: string
   consultouUltimosDias: string
   semConsultaUltimosDias: string
+  consultouDe: string // AAAA-MM-DD, dia de calendario em Brasilia
+  consultouAte: string
   minPassagens: string
   historicoEnvio: HistoricoEnvio
   jornada: Jornada
@@ -20,6 +22,8 @@ export const FILTROS_INICIAIS: Filtros = {
   origem: '',
   consultouUltimosDias: '',
   semConsultaUltimosDias: '',
+  consultouDe: '',
+  consultouAte: '',
   minPassagens: '',
   historicoEnvio: 'TODOS',
   jornada: 'TODAS',
@@ -71,6 +75,11 @@ export function listarPacientes(filtros: Filtros, pagina: number) {
   params.set('pagina', String(pagina))
   params.set('tamanho', String(TAMANHO_PAGINA))
   return api<Pagina<Paciente>>(`/pacientes?${params.toString()}`)
+}
+
+/** Todos os pacientes do filtro (ate 1.000, o limite por campanha), para marcar de uma vez. */
+export function selecionarTodosDoFiltro(filtros: Filtros) {
+  return api<Pagina<Paciente>>(`/pacientes/selecao?${parametros(filtros).toString()}`)
 }
 
 export function listarOrigens() {

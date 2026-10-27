@@ -6,12 +6,21 @@ import {
   listarOrigens,
   exportarPacientes,
   listarPacientes,
+  selecionarTodosDoFiltro,
   type Filtros,
   type Origem,
 } from '../lib/pacientes'
 import { Link } from 'react-router'
 import { formatarData, formatarNumero, formatarTelefone } from '../lib/formato'
 import { MAX_SELECAO, useSelecao } from '../lib/selecao'
+
+// Data de ontem no horario de Brasilia (AAAA-MM-DD), independente do fuso do computador
+function ontemEmBrasilia() {
+  const hoje = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date())
+  const d = new Date(`${hoje}T12:00:00Z`)
+  d.setUTCDate(d.getUTCDate() - 1)
+  return d.toISOString().slice(0, 10)
+}
 
 // Atestta e medsync separados; em cada grupo, o total ("todos") vem primeiro e os medicos depois
 function agruparOrigens(origens: Origem[]) {
@@ -86,6 +95,35 @@ export default function Pacientes() {
     setPagina(0)
   }
 
+  // Atalho: so quem consultou ontem. Ja aplica o filtro (mantem os outros campos preenchidos)
+  function filtrarOntem() {
+    const ontem = ontemEmBrasilia()
+    const novo = { ...rascunho, consultouDe: ontem, consultouAte: ontem, consultouUltimosDias: '' }
+    setRascunho(novo)
+    setFiltros(novo)
+    setPagina(0)
+  }
+
+  // Marca todos do filtro aplicado de uma vez (ate o limite de 1.000 por campanha)
+  const [selecionandoTodos, setSelecionandoTodos] = useState(false)
+  const [avisoSelecao, setAvisoSelecao] = useState<string | null>(null)
+
+  async function selecionarTodos() {
+    setSelecionandoTodos(true)
+    setAvisoSelecao(null)
+    try {
+      const resultado = await selecionarTodosDoFiltro(filtros)
+      adicionar(resultado.itens)
+      if (resultado.total > resultado.itens.length) {
+        setAvisoSelecao(`O filtro tem ${formatarNumero(resultado.total)} pacientes: foram marcados os primeiros ${formatarNumero(resultado.itens.length)} (limite por campanha), na ordem escolhida.`)
+      }
+    } catch (e) {
+      setAvisoSelecao(e instanceof Error ? e.message : 'Não foi possível selecionar.')
+    } finally {
+      setSelecionandoTodos(false)
+    }
+  }
+
   const todosDaPagina = itens.length > 0 && itens.every((p) => selecionados.has(p.id))
 
   function alternarPagina() {
@@ -102,15 +140,29 @@ export default function Pacientes() {
             {lista.data ? `${formatarNumero(total)} pacientes com telefone neste filtro` : 'Carregando…'}
           </p>
         </div>
-        <div className="text-right">
+        <div className="flex flex-wrap items-start justify-end gap-2 text-right">
+          <button onClick={selecionarTodos} disabled={selecionandoTodos || total === 0 || lista.isPlaceholderData}
+            title="Marca todos os pacientes do filtro aplicado, não só os da página"
+            className="rounded-md bg-marca-turquesa px-4 py-2 text-sm font-semibold text-white hover:bg-marca-petroleo disabled:opacity-50">
+            {selecionandoTodos
+              ? 'Selecionando…'
+              : total > MAX_SELECAO
+                ? `Selecionar os primeiros ${formatarNumero(MAX_SELECAO)}`
+                : `Selecionar todos do filtro (${formatarNumero(total)})`}
+          </button>
+          <div>
           <button onClick={exportar} disabled={exportando || total === 0}
             title="Baixa todos os pacientes do filtro aplicado, com origem, como conheceu, datas e histórico de envio"
             className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50">
             {exportando ? 'Exportando…' : `Exportar CSV (${formatarNumero(total)})`}
           </button>
           {erroExportacao && <p className="mt-1 text-xs text-red-700">{erroExportacao}</p>}
+          </div>
         </div>
       </div>
+      {avisoSelecao && (
+        <p className="rounded-md bg-amber-50 px-4 py-2 text-sm text-amber-800">{avisoSelecao}</p>
+      )}
 
       {/* Filtros */}
       <form onSubmit={aplicar} className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
@@ -188,6 +240,22 @@ export default function Pacientes() {
               <option value="PASSAGENS">Passagens</option>
             </select>
           </div>
+          <div>
+            <div className="mb-1 flex items-center justify-between">
+              <label className="block text-xs font-medium text-slate-600" htmlFor="de">Consultou de</label>
+              <button type="button" onClick={filtrarOntem}
+                className="text-xs font-semibold text-marca-petroleo hover:underline">
+                Só ontem
+              </button>
+            </div>
+            <input id="de" type="date" className={campo} value={rascunho.consultouDe}
+              onChange={(e) => alterar('consultouDe', e.target.value)} />
+          </div>
+          <div>
+            <label className={rotulo} htmlFor="ate">Consultou até</label>
+            <input id="ate" type="date" className={campo} value={rascunho.consultouAte}
+              onChange={(e) => alterar('consultouAte', e.target.value)} />
+          </div>
         </div>
         <div className="mt-4 flex justify-end gap-2">
           <button type="button" onClick={limparFiltros}
@@ -206,7 +274,7 @@ export default function Pacientes() {
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-marca-turquesa/40 bg-marca-claro/50 px-4 py-3 text-sm">
           <span className="text-marca-escuro">
             <strong>{formatarNumero(selecionados.size)}</strong> selecionado(s)
-            {selecionados.size >= MAX_SELECAO && ' — limite de 1.000 por campanha'}
+            {selecionados.size >= MAX_SELECAO && ' (limite de 1.000 por campanha)'}
           </span>
           <div className="flex items-center gap-4">
             <button onClick={limpar} className="font-medium text-marca-petroleo hover:underline">
