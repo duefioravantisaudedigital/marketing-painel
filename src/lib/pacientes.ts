@@ -3,6 +3,7 @@ import { api, baixar } from './api'
 export type HistoricoEnvio = 'TODOS' | 'NUNCA' | 'MARKETING' | 'UTILITY'
 export type Ordenacao = 'ULTIMA_CONSULTA' | 'NOME' | 'PASSAGENS'
 export type Jornada = 'TODAS' | 'MEDPREV_VOLTOU' | 'SO_MEDPREV'
+export type PeriodoMes = '' | 'INICIO' | 'MEIO' | 'FIM'
 
 export interface Filtros {
   origem: string
@@ -13,6 +14,7 @@ export interface Filtros {
   minPassagens: string
   historicoEnvio: HistoricoEnvio
   jornada: Jornada
+  periodoMes: PeriodoMes
   cidade: string
   estado: string // sigla da UF ou regiao (NORDESTE...)
   busca: string
@@ -28,6 +30,7 @@ export const FILTROS_INICIAIS: Filtros = {
   minPassagens: '',
   historicoEnvio: 'TODOS',
   jornada: 'TODAS',
+  periodoMes: '',
   cidade: '',
   estado: '',
   busca: '',

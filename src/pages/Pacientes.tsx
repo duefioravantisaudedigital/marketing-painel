@@ -262,6 +262,19 @@ export default function Pacientes() {
             <input id="ate" type="date" className={campo} value={rascunho.consultouAte}
               onChange={(e) => alterar('consultouAte', e.target.value)} />
           </div>
+          <div>
+            <label className={rotulo} htmlFor="periodoMes"
+              title="Pelo menos metade das passagens do paciente caiu nessa parte do mês (mínimo de 2 passagens)">
+              Costuma consultar no
+            </label>
+            <select id="periodoMes" className={campo} value={rascunho.periodoMes}
+              onChange={(e) => alterar('periodoMes', e.target.value as Filtros['periodoMes'])}>
+              <option value="">Tanto faz</option>
+              <option value="INICIO">Início do mês (dias 1 a 10)</option>
+              <option value="MEIO">Meio do mês (dias 11 a 20)</option>
+              <option value="FIM">Final do mês (dia 21 em diante)</option>
+            </select>
+          </div>
         </div>
         <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
           <div className="w-full sm:w-64">
