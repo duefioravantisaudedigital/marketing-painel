@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import {
   FILTROS_INICIAIS,
+  REGIOES,
   TAMANHO_PAGINA,
   listarOrigens,
   exportarPacientes,
@@ -198,6 +199,20 @@ export default function Pacientes() {
             <input id="cidade" className={campo} value={rascunho.cidade} maxLength={100} onChange={(e) => alterar('cidade', e.target.value)} />
           </div>
           <div>
+            <label className={rotulo} htmlFor="estado" title="Estado do cadastro; quando o cadastro não tem, usa o DDD do telefone">
+              Estado ou região
+            </label>
+            <select id="estado" className={campo} value={rascunho.estado} onChange={(e) => alterar('estado', e.target.value)}>
+              <option value="">Todos</option>
+              {REGIOES.map((r) => (
+                <optgroup key={r.codigo} label={r.nome}>
+                  <option value={r.codigo}>{r.nome} inteiro</option>
+                  {r.ufs.map((uf) => <option key={uf} value={uf}>{uf}</option>)}
+                </optgroup>
+              ))}
+            </select>
+          </div>
+          <div>
             <label className={rotulo} htmlFor="consultou">Consultou nos últimos (dias)</label>
             <input id="consultou" type="number" min={1} max={3650} className={campo} value={rascunho.consultouUltimosDias}
               onChange={(e) => alterar('consultouUltimosDias', e.target.value)} />
@@ -232,15 +247,6 @@ export default function Pacientes() {
             </select>
           </div>
           <div>
-            <label className={rotulo} htmlFor="ordenacao">Ordenar por</label>
-            <select id="ordenacao" className={campo} value={rascunho.ordenacao}
-              onChange={(e) => alterar('ordenacao', e.target.value as Filtros['ordenacao'])}>
-              <option value="ULTIMA_CONSULTA">Última consulta</option>
-              <option value="NOME">Nome</option>
-              <option value="PASSAGENS">Passagens</option>
-            </select>
-          </div>
-          <div>
             <div className="mb-1 flex items-center justify-between">
               <label className="block text-xs font-medium text-slate-600" htmlFor="de">Consultou de</label>
               <button type="button" onClick={filtrarOntem}
@@ -257,7 +263,17 @@ export default function Pacientes() {
               onChange={(e) => alterar('consultouAte', e.target.value)} />
           </div>
         </div>
-        <div className="mt-4 flex justify-end gap-2">
+        <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
+          <div className="w-full sm:w-64">
+            <label className={rotulo} htmlFor="ordenacao">Ordenar por</label>
+            <select id="ordenacao" className={campo} value={rascunho.ordenacao}
+              onChange={(e) => alterar('ordenacao', e.target.value as Filtros['ordenacao'])}>
+              <option value="ULTIMA_CONSULTA">Última consulta</option>
+              <option value="NOME">Nome</option>
+              <option value="PASSAGENS">Passagens</option>
+            </select>
+          </div>
+          <div className="flex gap-2">
           <button type="button" onClick={limparFiltros}
             className="rounded-md px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100">
             Limpar filtros
@@ -266,6 +282,7 @@ export default function Pacientes() {
             className="rounded-md bg-marca-petroleo px-4 py-2 text-sm font-semibold text-white hover:bg-marca-escuro">
             Filtrar
           </button>
+          </div>
         </div>
       </form>
 
@@ -343,7 +360,13 @@ export default function Pacientes() {
                   </td>
                   <td className="whitespace-nowrap px-3 py-2.5 text-slate-700">{formatarTelefone(p.telefone)}</td>
                   <td className="px-3 py-2.5 text-slate-700">
-                    {p.cidade ? `${p.cidade}${p.estado ? `/${p.estado}` : ''}` : '—'}
+                    {p.cidade ? `${p.cidade}${p.uf ? `/${p.uf}` : ''}` : (p.uf ?? '—')}
+                    {p.ufPeloDdd && (
+                      <span title="O cadastro não tem estado: veio do DDD do telefone"
+                        className="ml-1.5 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-500">
+                        DDD
+                      </span>
+                    )}
                   </td>
                   <td className="px-3 py-2.5 text-right tabular-nums text-slate-700">{p.passagens}</td>
                   <td className="whitespace-nowrap px-3 py-2.5 text-slate-700">

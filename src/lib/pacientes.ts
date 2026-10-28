@@ -14,6 +14,7 @@ export interface Filtros {
   historicoEnvio: HistoricoEnvio
   jornada: Jornada
   cidade: string
+  estado: string // sigla da UF ou regiao (NORDESTE...)
   busca: string
   ordenacao: Ordenacao
 }
@@ -28,6 +29,7 @@ export const FILTROS_INICIAIS: Filtros = {
   historicoEnvio: 'TODOS',
   jornada: 'TODAS',
   cidade: '',
+  estado: '',
   busca: '',
   ordenacao: 'ULTIMA_CONSULTA',
 }
@@ -39,6 +41,8 @@ export interface Paciente {
   email: string | null
   cidade: string | null
   estado: string | null
+  uf: string | null // estado do cadastro normalizado ou, se faltar, pelo DDD
+  ufPeloDdd: boolean
   fonte: string
   passagens: number
   ultimaConsulta: string | null
@@ -91,3 +95,12 @@ export function exportarPacientes(filtros: Filtros) {
   const hoje = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date())
   return baixar(`/pacientes/exportar?${parametros(filtros).toString()}`, `pacientes-${hoje}.csv`)
 }
+
+// Estados agrupados por regiao, na ordem da lista do filtro
+export const REGIOES: { codigo: string; nome: string; ufs: string[] }[] = [
+  { codigo: 'SUDESTE', nome: 'Sudeste', ufs: ['SP', 'RJ', 'MG', 'ES'] },
+  { codigo: 'SUL', nome: 'Sul', ufs: ['PR', 'SC', 'RS'] },
+  { codigo: 'NORDESTE', nome: 'Nordeste', ufs: ['BA', 'PE', 'CE', 'RN', 'PB', 'AL', 'SE', 'MA', 'PI'] },
+  { codigo: 'CENTRO_OESTE', nome: 'Centro-Oeste', ufs: ['DF', 'GO', 'MT', 'MS'] },
+  { codigo: 'NORTE', nome: 'Norte', ufs: ['PA', 'AM', 'TO', 'RO', 'AC', 'AP', 'RR'] },
+]
